@@ -1,0 +1,22 @@
+You must write the commands on one line to be executed directly in a console
+
+FITR - FinanceTracker add
+
+Usage:
+  ./fitr add
+
+Options:
+  --help, -h                          Show this help message
+  --recur, -r                         Select recurring transaction type
+  --single, -s                        Select single transaction type
+  --name <n>, -n <n>                  Add name n
+  --description <d>, -d <d>           Add description d
+  --income, -inc                      Select income transaction type
+  --expense, -exp                     Select expense transaction type
+  --amount <a>, -amt <a>              Add amount a in p or £.pp format
+  --periodtype <p>, -pt <p>           Add period type p (for recurring transactions)
+                                      {DAILY, WEEKLY, N_WEEKLY, MONTHLY, N_MONTHLY, YEARLY}
+  --dateoftransaction <d>, -dt <d>    Add date of transaction d in yyyy-MM-dd format (for single transactions)
+  --startdate <d>, -sd <d>            Add start date d in yyyy-MM-dd format (for recurring transactions)
+  --enddate <d>, -ed <d>              Add end date d in yyyy-MM-dd format (for recurring transactions)
+  --interval <i>, -i <i>              Add interval i (for N-based recurring transactions)

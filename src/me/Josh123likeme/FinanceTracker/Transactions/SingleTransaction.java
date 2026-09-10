@@ -6,7 +6,7 @@ import me.Josh123likeme.FinanceTracker.TUID;
 
 public class SingleTransaction {
 	
-	public final String tuid;
+	private String tuid;
 	public String name;
 	public String description;
 	public String category;
@@ -43,6 +43,11 @@ public class SingleTransaction {
 		if (dateOfTransaction == null) throw new IllegalArgumentException("Date of transaction cannot be null");
 		else this.dateOfTransaction = dateOfTransaction;
 		
+	}
+	
+	public String getTUID() {
+		
+		return tuid;
 	}
 	
 	public String toString() {

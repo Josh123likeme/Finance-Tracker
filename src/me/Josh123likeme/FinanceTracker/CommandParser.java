@@ -11,7 +11,7 @@ import me.Josh123likeme.FinanceTracker.Transactions.*;
 
 public class CommandParser {
 	
-	private static final Path DATALOC = Path.of("transactions.json");
+	private static final Path DATALOC = Path.of(System.getProperty("user.home")).resolve("transaction.json");
 	
 	public static void parseCommand(String[] args) {
 
@@ -116,7 +116,7 @@ public class CommandParser {
 				break;
 			case "-amt":
 			case "--amount":
-				if (args[i + 1].charAt(0) == '£') amount = Money.parse(args[++i].substring(1));
+				if (args[i + 1].charAt(0) == 'ï¿½') amount = Money.parse(args[++i].substring(1));
 				else amount = Money.parse(args[++i]);
 				break;
 			case "-pt":
@@ -254,12 +254,12 @@ public class CommandParser {
 			
 			String tuid = null;
 			
-			if (recurringTransactions.size() == 1) tuid = recurringTransactions.get(0).tuid;
-			else tuid = singleTransactions.get(0).tuid;
+			if (recurringTransactions.size() == 1) tuid = recurringTransactions.get(0).getTUID();
+			else tuid = singleTransactions.get(0).getTUID();
 			
 			for (RecurringTransaction transaction : tm.getRecurringTransactions()) {
 
-				if (transaction.tuid.equals(tuid)) {
+				if (transaction.getTUID().equals(tuid)) {
 					tm.getRecurringTransactions().remove(transaction);
 					break;
 				}
@@ -267,7 +267,7 @@ public class CommandParser {
 			}
 			for (SingleTransaction transaction : tm.getSingleTransactions()) {
 
-				if (transaction.tuid.equals(tuid)) {
+				if (transaction.getTUID().equals(tuid)) {
 					tm.getSingleTransactions().remove(transaction);
 					break;
 				}
@@ -312,21 +312,21 @@ public class CommandParser {
 			
 			for (RecurringTransaction transaction : recurringTransactions) {
 				
-				if (i++ == choice) targetTuid = transaction.tuid;
+				if (i++ == choice) targetTuid = transaction.getTUID();
 			}
 			for (SingleTransaction transaction : singleTransactions) {
 				
-				if (i++ == choice) targetTuid = transaction.tuid;
+				if (i++ == choice) targetTuid = transaction.getTUID();
 			}
 			
 			for (RecurringTransaction transaction : tm.getRecurringTransactions()) {
 				
-				if (transaction.tuid.equals(targetTuid)) tm.getRecurringTransactions().remove(transaction);
+				if (transaction.getTUID().equals(targetTuid)) tm.getRecurringTransactions().remove(transaction);
 				break;
 			}
 			for (SingleTransaction transaction : tm.getSingleTransactions()) {
 				
-				if (transaction.tuid.equals(targetTuid)) tm.getSingleTransactions().remove(transaction);
+				if (transaction.getTUID().equals(targetTuid)) tm.getSingleTransactions().remove(transaction);
 				break;
 			}
 			
@@ -453,6 +453,7 @@ public class CommandParser {
 		
 		Scanner scanner = new Scanner(System.in);
 		String response = scanner.nextLine();
+		scanner.close();
 		
 		if (response.equals("CLEAR")) {
 			

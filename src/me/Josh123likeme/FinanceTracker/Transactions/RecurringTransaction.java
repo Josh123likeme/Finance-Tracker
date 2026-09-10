@@ -6,7 +6,7 @@ import me.Josh123likeme.FinanceTracker.TUID;
 
 public class RecurringTransaction {
 	
-	public final String tuid;
+	private String tuid;
 	public String name;
 	public String description;
 	public String category;
@@ -32,7 +32,7 @@ public class RecurringTransaction {
 		tuid = TUID.generateTimestampedUniqueIdentifier();
 		
 		
-		if (name == null || name == "") {
+		if (name == null || name.isEmpty()) {
 			this.name = "Transaction " + tuid;
 			System.out.println("WARN: No name provided. Using unique generated name \"" + this.name + "\"");
 		}
@@ -67,7 +67,11 @@ public class RecurringTransaction {
 	public SingleTransaction generateSingleTransactionInstance(LocalDate date) {
 		
 		return new SingleTransaction(name, description, category, transactionDirection, amount, date);
+	}
+	
+	public String getTUID() {
 		
+		return tuid;
 	}
 	
 	public String toString() {

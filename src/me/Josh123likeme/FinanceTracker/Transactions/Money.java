@@ -2,7 +2,7 @@ package me.Josh123likeme.FinanceTracker.Transactions;
 
 public class Money {
 	
-	private final long pence;
+	private long pence;
 	
 	public Money(long pence) {
 		

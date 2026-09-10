@@ -1,4 +1,4 @@
-You must write the commands on one line to be executed directly in a console
+You must write the commands on one line to be executed directly in a console.
 
 FITR - FinanceTracker add
 

@@ -116,7 +116,7 @@ public class CommandParser {
 				break;
 			case "-amt":
 			case "--amount":
-				if (args[i + 1].charAt(0) == 'Â£') amount = Money.parse(args[++i].substring(1));
+				if (args[i + 1].charAt(0) == '£') amount = Money.parse(args[++i].substring(1));
 				else amount = Money.parse(args[++i]);
 				break;
 			case "-pt":

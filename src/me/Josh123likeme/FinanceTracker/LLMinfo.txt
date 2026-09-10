@@ -1,9 +1,12 @@
-You must write the commands on one line to be executed directly in a console
+You must write the commands on one line to be executed directly in a console. 
+The name should be simple. 
+The description should be used for transactions that aren't self explanatory from the name.
+The category should always be included. It is one word in block capitals
 
 FITR - FinanceTracker add
 
 Usage:
-  ./fitr add
+  fitr add
 
 Options:
   --help, -h                          Show this help message
@@ -11,6 +14,7 @@ Options:
   --single, -s                        Select single transaction type
   --name <n>, -n <n>                  Add name n
   --description <d>, -d <d>           Add description d
+  --category <c>, -c <c>              Add category c
   --income, -inc                      Select income transaction type
   --expense, -exp                     Select expense transaction type
   --amount <a>, -amt <a>              Add amount a in p or £.pp format

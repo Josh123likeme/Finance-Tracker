@@ -34,6 +34,8 @@ public class SingleTransaction {
 		if (description == null) this.description = "";
 		else this.description = description;
 		
+		this.category = category;
+		
 		if (transactionDirection == null) throw new IllegalArgumentException("Transaction direction must not be null");
 		else this.transactionDirection = transactionDirection;
 		

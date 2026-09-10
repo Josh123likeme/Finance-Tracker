@@ -11,7 +11,7 @@ import me.Josh123likeme.FinanceTracker.Transactions.*;
 
 public class CommandParser {
 	
-	private static final Path DATALOC = Path.of(System.getProperty("user.home")).resolve("transaction.json");
+	private static final Path DATALOC = Path.of(System.getProperty("user.home")).resolve("transactions.json");
 	
 	public static void parseCommand(String[] args) {
 

@@ -81,7 +81,6 @@ public class RecurringTransaction {
 		
 		str.append(transactionDirection == TransactionDirection.INCOME ? "+" : "-");
 		str.append(amount.toString() + " ");
-		while (str.length() < 10) str.append(" ");
 		if (periodType.requiresInterval) str.append("Every " + interval + " " + periodType.niceName + " ");
 		else str.append("Every " + periodType.niceName + " ");
 		str.append( "[" + startDate.toString() + " to " + (endDate != null ? endDate.toString() : "FOREVER") + "]: ");

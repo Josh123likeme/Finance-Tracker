@@ -57,7 +57,6 @@ public class SingleTransaction {
 		
 		str.append(transactionDirection == TransactionDirection.INCOME ? "+" : "-");
 		str.append(amount.toString() + " ");
-		while (str.length() < 10) str.append(" ");
 		str.append("[" + dateOfTransaction.toString() + "]: ");
 		str.append(name + " (" + (category != null ? category : "No Category") + ")");
 		if (description != null && description.length() > 0) str.append(" - " + description);

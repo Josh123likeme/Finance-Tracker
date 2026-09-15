@@ -1,5 +1,7 @@
 package me.Josh123likeme.FinanceTracker;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -39,6 +41,11 @@ public class CommandParser {
 		case "transactions": parseTransactionsCommand(Arrays.copyOfRange(args, 1, args.length)); break;
 		case "clear": parseClearCommand(Arrays.copyOfRange(args, 1, args.length)); break;
 		case "categories": parseCategoriesCommand(Arrays.copyOfRange(args, 1, args.length)); break;
+		case "llm": parseLLMCommand(Arrays.copyOfRange(args, 1, args.length)); break;
+		
+		default:
+			System.out.println("Unrecognised command \"" + args[0] + "\"");
+			System.exit(1);
 		
 		}
 		
@@ -515,6 +522,56 @@ public class CommandParser {
 			System.out.println();
 			
 		}
+		
+	}
+	
+	private static void parseLLMCommand(String[] args) {
+		
+		if (args.length == 0) {
+			
+			System.out.println(getFullLLMInfo());
+			
+			return;	
+		}
+		
+		StringBuilder query = new StringBuilder();
+		
+		query.append(getFullLLMInfo());
+		
+		query.append("\n\n----USER INPUT----\n" + args[0]);
+		
+		System.out.println(query.toString());
+		
+	}
+	
+	private static String getFullLLMInfo() {
+		
+		StringBuilder info = new StringBuilder();
+		
+		info.append("----LLM INFO----\n");
+		
+		try {
+		    InputStream input = CommandParser.class.getResourceAsStream("commands.txt");
+
+		    String commands = new String(input.readAllBytes());
+		    info.append(commands);
+
+		} catch (IOException e) {
+		    e.printStackTrace();
+		}
+		
+		info.append("\nCategories already added: ");
+		
+		TransactionManager tm = new TransactionManager();
+		tm.loadTransactions(DATALOC);
+		
+		for (String category : tm.getTransactionCategories()) {
+			
+			info.append(category + ",");
+			
+		}
+		
+		return info.toString();
 		
 	}
 	

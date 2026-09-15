@@ -1,0 +1,26 @@
+You must write the commands on one line to be executed directly in a console. 
+The name should be simple (preferably the name of the transaction party). 
+The description should be used for complex transaction reasons that can not be derived from the name.
+The category should always be included. It is one word in block capitals.
+
+FITR - FinanceTracker add
+
+Usage:
+  fitr add
+
+Options:
+  --help, -h                          Show this help message
+  --recur, -r                         Select recurring transaction type
+  --single, -s                        Select single transaction type
+  --name <n>, -n <n>                  Add name n
+  --description <d>, -d <d>           Add description d
+  --category <c>, -c <c>              Add category c
+  --income, -inc                      Select income transaction type
+  --expense, -exp                     Select expense transaction type
+  --amount <a>, -amt <a>              Add amount a in pence or pounds.pence (eg: 57 or 4.52; no currency symbol)
+  --periodtype <p>, -pt <p>           Add period type p (required for recurring transactions)
+                                      {DAILY, WEEKLY, N_WEEKLY, MONTHLY, N_MONTHLY, YEARLY}
+  --dateoftransaction <d>, -dt <d>    Add date of transaction d in yyyy-MM-dd format (required for single transactions)
+  --startdate <d>, -sd <d>            Add start date d in yyyy-MM-dd format (required for recurring transactions)
+  --enddate <d>, -ed <d>              Add end date d in yyyy-MM-dd format (required for recurring transactions)
+  --interval <i>, -i <i>              Add interval i (required for N-based recurring transactions)

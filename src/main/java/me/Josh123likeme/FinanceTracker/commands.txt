@@ -1,7 +1,9 @@
 You must write the commands on one line to be executed directly in a console. 
+Every transaction MUST be single or recurring. Do NOT create transactions that are neither or both. If no type is provided, one MUST be chosen.
 The name should be simple (preferably the name of the transaction party). 
 The description should be used for complex transaction reasons that can not be derived from the name.
 The category should always be included. It is one word in block capitals.
+If the amount is provided as an integer, it will be interpreted as pence. If it is a decimal, it will be interpreted as pounds and pence.
 
 FITR - FinanceTracker add
 

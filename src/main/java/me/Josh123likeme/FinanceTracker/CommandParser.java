@@ -2,18 +2,29 @@ package me.Josh123likeme.FinanceTracker;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import me.Josh123likeme.FinanceTracker.Transactions.*;
 
 public class CommandParser {
 	
-	private static final Path DATALOC = Path.of(System.getProperty("user.home")).resolve("transactions.json");
+	private static final Path DATA_LOC = Path.of(System.getProperty("user.home")).resolve("transactions.json");
+	private static final String MODEL = "qwen3:8b";
+	private static final String OLLAMA_URL = "http://localhost:11434";
 	
 	public static void parseCommand(String[] args) {
 
@@ -123,7 +134,7 @@ public class CommandParser {
 				break;
 			case "-amt":
 			case "--amount":
-				if (args[i + 1].charAt(0) == '�') amount = Money.parse(args[++i].substring(1));
+				if (args[i + 1].charAt(0) == '£') amount = Money.parse(args[++i].substring(1));
 				else amount = Money.parse(args[++i]);
 				break;
 			case "-pt":
@@ -174,7 +185,7 @@ public class CommandParser {
 		
 		TransactionManager tm = new TransactionManager();
 		
-		tm.loadTransactions(DATALOC);
+		tm.loadTransactions(DATA_LOC);
 		
 		//category provided is new
 		if (category != null && !tm.getTransactionCategories().contains(category)) {
@@ -196,7 +207,7 @@ public class CommandParser {
 			System.out.println("Added new recurring transaction \"" + rt.name + "\"");
 		}
 			
-		tm.saveTransactions(DATALOC);
+		tm.saveTransactions(DATA_LOC);
 		
 	}
 	
@@ -220,7 +231,7 @@ public class CommandParser {
 		
 		TransactionManager tm = new TransactionManager();
 		
-		tm.loadTransactions(DATALOC);
+		tm.loadTransactions(DATA_LOC);
 		
 		List<RecurringTransaction> recurringTransactions = new ArrayList<RecurringTransaction>();
 		List<SingleTransaction> singleTransactions = new ArrayList<SingleTransaction>();
@@ -281,7 +292,7 @@ public class CommandParser {
 				
 			}
 			
-			tm.saveTransactions(DATALOC);
+			tm.saveTransactions(DATA_LOC);
 			
 			System.out.println("Removed transaction\n");
 	
@@ -339,7 +350,7 @@ public class CommandParser {
 			
 			System.out.println("Removed transaction\n");
 			
-			tm.saveTransactions(DATALOC);
+			tm.saveTransactions(DATA_LOC);
 			
 		}
 		
@@ -356,7 +367,7 @@ public class CommandParser {
 		
 		TransactionManager tm = new TransactionManager();
 		
-		tm.loadTransactions(DATALOC);
+		tm.loadTransactions(DATA_LOC);
 		
 		System.out.println("\n----Recurring transactions----");
 		
@@ -416,7 +427,7 @@ public class CommandParser {
 		
 		TransactionManager tm = new TransactionManager();
 		
-		tm.loadTransactions(DATALOC);
+		tm.loadTransactions(DATA_LOC);
 		
 		Money totalIncome = new Money(0);
 		Money totalExpense = new Money(0);
@@ -466,12 +477,12 @@ public class CommandParser {
 			
 			TransactionManager tm = new TransactionManager();
 			
-			tm.loadTransactions(DATALOC);
+			tm.loadTransactions(DATA_LOC);
 			
 			tm.getRecurringTransactions().clear();
 			tm.getSingleTransactions().clear();
 			
-			tm.saveTransactions(DATALOC);
+			tm.saveTransactions(DATA_LOC);
 			
 			System.out.println("All transactions cleared\n");
 			
@@ -492,7 +503,7 @@ public class CommandParser {
 			String category = args[1];
 			
 			TransactionManager tm = new TransactionManager();
-			tm.loadTransactions(DATALOC);
+			tm.loadTransactions(DATA_LOC);
 			
 			if (tm.getTransactionCategories().contains(category)) {
 				
@@ -502,7 +513,7 @@ public class CommandParser {
 			
 			tm.getTransactionCategories().add(category);
 			
-			tm.saveTransactions(DATALOC);
+			tm.saveTransactions(DATA_LOC);
 			
 			System.out.println("Added new category \"" + category + "\"\n");
 			
@@ -510,7 +521,7 @@ public class CommandParser {
 		else {
 			
 			TransactionManager tm = new TransactionManager();
-			tm.loadTransactions(DATALOC);
+			tm.loadTransactions(DATA_LOC);
 			
 			System.out.println("\n----Categories----");
 			
@@ -534,13 +545,13 @@ public class CommandParser {
 			return;	
 		}
 		
-		StringBuilder query = new StringBuilder();
+		StringBuilder prompt = new StringBuilder();
 		
-		query.append(getFullLLMInfo());
+		prompt.append(getFullLLMInfo());
 		
-		query.append("\n\n----USER INPUT----\n" + args[0]);
+		prompt.append("\n\n----USER INPUT----\n" + args[0]);
 		
-		System.out.println(query.toString());
+		sendToOllama(prompt.toString());
 		
 	}
 	
@@ -563,7 +574,7 @@ public class CommandParser {
 		info.append("\nCategories already added: ");
 		
 		TransactionManager tm = new TransactionManager();
-		tm.loadTransactions(DATALOC);
+		tm.loadTransactions(DATA_LOC);
 		
 		for (String category : tm.getTransactionCategories()) {
 			
@@ -574,6 +585,135 @@ public class CommandParser {
 		return info.toString();
 		
 	}
+	
+	private static void sendToOllama(String prompt) {
+		
+        try {
+        
+		    //check if ollama is running
+			if (!isOllamaRunning()) {
+		
+		        System.out.println("Starting Ollama...");
+		
+		        new ProcessBuilder("ollama", "serve")
+		                .redirectError(ProcessBuilder.Redirect.DISCARD)
+		                .redirectOutput(ProcessBuilder.Redirect.DISCARD)
+		                .start();
+		
+		        waitForOllama();
+		    }
+		
+		    //send the prompt
+		    System.out.println("Asking " + MODEL + "...");
+		
+		    Gson gson = new Gson();
+		    JsonObject jsonObject = new JsonObject();
+		    jsonObject.addProperty("model", MODEL);
+		    jsonObject.addProperty("prompt", prompt);
+		    jsonObject.addProperty("stream", false);
+		    
+		    String json = gson.toJson(jsonObject);
+		    
+		    HttpClient client = HttpClient.newBuilder()
+		            .connectTimeout(Duration.ofSeconds(10))
+		            .build();
+		
+		    HttpRequest request = HttpRequest.newBuilder()
+		            .uri(URI.create(OLLAMA_URL + "/api/generate"))
+		            .timeout(Duration.ofMinutes(10))
+		            .header("Content-Type", "application/json")
+		            .POST(HttpRequest.BodyPublishers.ofString(json))
+		            .build();
+		
+		    HttpResponse<String> response =
+		            client.send(
+		                    request,
+		                    HttpResponse.BodyHandlers.ofString()
+		            );
+		
+		    //check HTTP response
+		    if (response.statusCode() != 200) {
+		        System.err.println(
+		                "Ollama returned HTTP " + response.statusCode()
+		        );
+		
+		        System.err.println(response.body());
+		        return;
+		    }
+		
+		    //get prompt response
+
+		    JsonObject responseJson = JsonParser.parseString(response.body()).getAsJsonObject();
+
+		    String command = responseJson.get("response").getAsString().trim();
+		    
+		    System.out.println(MODEL + " proposed command: " + command);
+		    
+		    System.out.println("Execute? (y/n)");
+		    
+		    Scanner scanner = new Scanner(System.in);
+			String userResponse = scanner.nextLine();
+			scanner.close();
+			
+			if (userResponse.equals("y") || userResponse.equals("Y")) {
+				
+				System.out.println("Executing command");
+				
+				parseCommand(Arrays.copyOfRange(command.split(" "), 1, command.split(" ").length));
+			}
+			else System.out.println("Cancelling command");
+
+		} catch (Exception e) {
+		
+		    System.err.println("Error:");
+		    e.printStackTrace();
+		    
+		}
+		
+	}
+	
+    private static boolean isOllamaRunning() {
+
+        try {
+
+            HttpClient client = HttpClient.newHttpClient();
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(OLLAMA_URL + "/api/tags"))
+                    .timeout(Duration.ofSeconds(2))
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response =
+                    client.send(
+                            request,
+                            HttpResponse.BodyHandlers.ofString()
+                    );
+
+            return response.statusCode() == 200;
+
+        } catch (Exception e) {
+
+            return false;
+        }
+    }
+
+    private static void waitForOllama() throws Exception {
+
+        for (int i = 0; i < 30; i++) {
+
+            if (isOllamaRunning()) {
+                System.out.println("Ollama is ready.");
+                return;
+            }
+
+            Thread.sleep(500);
+        }
+
+        throw new RuntimeException(
+                "Ollama failed to start."
+        );
+    }
 	
 	private enum TransactionType {
 		
